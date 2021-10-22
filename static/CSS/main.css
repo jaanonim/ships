@@ -1,0 +1,130 @@
+:root {
+    --x_size: 10;
+    --y_size: 10;
+}
+
+body {
+    background-color: #333;
+    color: #fff;
+}
+
+.plansza {
+    float: left;
+    display: grid;
+    grid-template-columns: repeat(var(--x_size), 50px);
+    grid-template-rows: repeat(var(--y_size), 50px);
+    padding: 20px;
+}
+
+nav {
+    width: 250px;
+    float: left;
+    min-height: 100px;
+}
+
+.s-container {
+    display: flex;
+    margin: 10px;
+}
+
+
+
+.element {
+    background-color: rgb(75, 75, 75);
+    border: 1px solid rgb(0, 0, 0);
+    width: 50px;
+    height: 50px;
+    position: relative;
+}
+
+.hover {
+    background-color: rgb(0, 102, 255);
+}
+
+.selected {
+    background-color: rgb(0, 255, 55);
+}
+
+.statek {
+    background-color: rgb(136, 136, 136);
+}
+
+.gost_nope {
+    background-color: rgb(255, 0, 0);
+
+}
+
+.gost_ok {
+    background-color: rgb(0, 255, 55);
+
+}
+
+.button {
+    position: fixed;
+    bottom: 20px;
+    left: 50vw;
+}
+
+.hit {
+    color: rgb(255, 0, 0)
+}
+
+.miss {
+    color: rgb(0, 255, 0);
+}
+
+.miss::before {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 10;
+    content: '';
+    background: rgb(255, 255, 255);
+    display: block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+.hit::before {
+    position: absolute;
+    top: 10px;
+    left: 22.5px;
+    z-index: 10;
+    content: '';
+    background: rgb(255, 0, 0);
+    display: block;
+    width: 5px;
+    height: 30px;
+    transform: rotate(45deg);
+}
+
+.hit::after {
+    position: absolute;
+    top: 10px;
+    left: 22.5px;
+    z-index: 10;
+    content: '';
+    background: rgb(255, 0, 0);
+    display: block;
+    width: 5px;
+    height: 30px;
+    transform: rotate(-45deg);
+}
+
+button,
+input[type=submit] {
+    display: block;
+    margin: 1rem;
+    background-color: #222;
+    border: #fff solid 1px;
+    border-radius: 1rem;
+    padding: 10px;
+    font-size: 1.2rem;
+    color: #fff;
+}
+
+input[type=submit]:hover,
+button:hover {
+    background-color: #151515;
+}
