@@ -72,7 +72,7 @@ export default class GameManager {
         this.p_gracz.update_ships()
 
         this.p_opponent = new Map(this.size_x, this.size_y, this.bot_div)
-        this.p_opponent.hide(false)
+        //this.p_opponent.hide(false)
         this.p_opponent.lock()
 
         ShipList.selected_id = -1
