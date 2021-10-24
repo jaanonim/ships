@@ -6,6 +6,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
     //new GameManager([0, 1, 2, 1, 1], 10, 10)
     window.GM = new GameManager([4, 3, 2, 1], 10, 10)
     let room = window.location.pathname.replace("/game/", "")
-    navigator.clipboard.writeText(room)
+    try {
+        navigator.clipboard.writeText(room)
+    } catch {}
     new Socket(room)
 });
