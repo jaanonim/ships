@@ -117,9 +117,10 @@ export default class Tile {
         for (let i = 0; i < this.ships.length; i++) {
             if (this.ships[i].is_sinked()) {
                 this.ships[i].sink()
+                return true
             }
-
         }
+        return false
     }
 
     remove_ship(ship) {

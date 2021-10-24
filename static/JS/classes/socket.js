@@ -12,6 +12,7 @@ export default class Socket {
     static ready_f
     static win_f
     static restart_f
+    static left_f
 
     constructor(room) {
         Socket.socket = io('', {
@@ -62,7 +63,7 @@ export default class Socket {
 
         Socket.socket.on("start", (msg) => {
             console.log("start", msg);
-            Socket.set_board(msg[Socket.opponent_id], true)
+            Socket.set_board(msg[Socket.opponent_id], null, null, true)
         });
 
         Socket.socket.on("move", (msg) => {
@@ -75,7 +76,7 @@ export default class Socket {
         Socket.socket.on("plansza", (msg) => {
             console.log("plansza", msg, Socket.socket.id, Socket.opponent_id);
             if (Socket.socket.id === msg.id) {
-                Socket.set_board(msg.board)
+                Socket.set_board(msg.board, msg.x, msg.y)
             }
         })
         Socket.socket.on("end", (msg) => {
@@ -85,6 +86,10 @@ export default class Socket {
         Socket.socket.on("restart", (msg) => {
             console.log("restart", msg);
             Socket.restart_f()
+        })
+        Socket.socket.on("left", (msg) => {
+            console.log("left", msg);
+            Socket.left_f()
         })
     }
 }

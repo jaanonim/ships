@@ -79,12 +79,17 @@ export default class GameManager {
         ShipList.ship_list = []
         ShipList.update()
 
-        Socket.set_board = (x, b = false) => {
+        Socket.set_board = (obj, x, y, b = false) => {
             this.controls.innerText = "Ruch przeciwnika"
-            if (b) {
-                this.p_opponent.from_json(x)
+            if (b || (x == null && y == null)) {
+                this.p_opponent.from_json(obj)
             } else {
-                this.p_gracz.from_json(x)
+                this.p_gracz.from_json(obj)
+                if (this.p_gracz.plansza[x][y].type === 2) {
+                    if (this.p_gracz.plansza[x][y].check_for_sink()) {
+                        Socket.send_board(this.p_gracz.to_json(), null, null)
+                    }
+                }
             }
         }
         Socket.make_move = () => {
@@ -102,6 +107,14 @@ export default class GameManager {
         }
         Socket.restart_f = () => {
             this.init()
+        }
+        Socket.left_f = () => {
+            this.p_opponent.lock()
+            this.p_gracz.lock()
+            this.controls.innerText = "Przeciwnik się rozłączył 😕. Aby zagrać stwóż nowy pokój."
+            this.createButton("Wróć do menu", () => {
+                window.location = '/menu';
+            })
         }
 
 
@@ -137,9 +150,6 @@ export default class GameManager {
     turn(t) {
         this.p_opponent.lock()
         this.controls.innerText = "Ruch przeciwnika"
-        if (t.type === 2) {
-            t.check_for_sink()
-        }
         Socket.send_board(this.p_opponent.to_json(), t.x, t.y)
     }
 

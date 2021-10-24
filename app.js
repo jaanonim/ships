@@ -19,7 +19,6 @@ server.listen(5000, () => console.log("Listening on http://localhost:5000"))
 
 
 app.get("/", (req, res) => {
-    console.log("ok")
     res.redirect("/menu")
 })
 
@@ -55,6 +54,8 @@ app.post("/join", (req, res) => {
 var rooms = {}
 
 io.on('connection', (socket) => {
+    console.log("connection", socket.id)
+
     let room = socket.handshake.query.room
 
     const clients = io.sockets.adapter.rooms.get(room);
@@ -66,9 +67,26 @@ io.on('connection', (socket) => {
     }
 
     socket.join(room)
-    rooms[room] = {
-        ready: 0
+
+    if (rooms[room] == undefined) {
+        rooms[room] = {
+            players: 1,
+            ready: 0
+        }
+    } else {
+        if (rooms[room].players > 1) {
+            socket.disconnect()
+            return
+        }
+        rooms[room].players++
+
+        if (rooms[room].ready > 0) {
+            io.to(room).emit("status", Object.keys(rooms[room].boards)[0])
+        }
     }
+
+
+
 
     socket.on("ready", (msg) => {
         console.log("ready", msg)
@@ -78,7 +96,6 @@ io.on('connection', (socket) => {
             rooms[room]["boards"] = {}
         }
         rooms[room]["boards"][socket.id] = JSON.parse(msg)
-        console.log("ready", rooms[room]["boards"])
 
         io.to(room).emit("status", socket.id)
         if (rooms[room].ready == 2) {
@@ -90,6 +107,8 @@ io.on('connection', (socket) => {
     })
 
     socket.on("plansza", (msg) => {
+        console.log("plansza", msg)
+
         rooms[room]["boards"][socket.id] = msg.board
         io.to(room).emit("plansza", {
             id: msg.id,
@@ -97,6 +116,10 @@ io.on('connection', (socket) => {
             y: msg.y,
             board: rooms[room]["boards"][socket.id]
         })
+
+        if (msg.x == null && msg.y == null) {
+            return
+        }
 
         if (is_gameover(msg.board)) {
             io.to(room).emit("end", socket.id)
@@ -110,11 +133,20 @@ io.on('connection', (socket) => {
     })
 
     socket.on("restart", (msg) => {
+        console.log("restart", msg)
+
         rooms[room] = {
-            ready: 0
+            ready: 0,
+            players: 2
         }
         io.to(room).emit("restart")
     })
+
+    socket.on('disconnecting', (socket) => {
+        console.log("disconnect", socket)
+
+        io.to(room).emit("left")
+    });
 });
 
 function is_gameover(board) {
@@ -127,8 +159,3 @@ function is_gameover(board) {
     }
     return true
 }
-
-
-io.on('disconnect', (socket) => {
-
-});
