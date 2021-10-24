@@ -14,7 +14,7 @@ const {
 const io = new Server(server);
 
 
-server.listen(5000, () => console.log("Listening on http://localhost:5000"))
+server.listen(5050, () => console.log("Listening on http://localhost:5050"))
 
 
 
