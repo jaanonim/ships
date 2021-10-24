@@ -37,8 +37,8 @@ export default class Map {
     }
 
     update_all() {
-        for (let x = 0; x < size_x; x++) {
-            for (let y = 0; y < size_y; y++) {
+        for (let x = 0; x < this.size_x; x++) {
+            for (let y = 0; y < this.size_y; y++) {
                 this.plansza[x][y].update()
             }
         }
