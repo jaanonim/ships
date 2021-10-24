@@ -72,4 +72,31 @@ export default class Map {
 
         statek.pleace()
     }
+
+    to_json() {
+
+        let res = []
+        for (let x = 0; x < this.size_x; x++) {
+            res[x] = []
+            for (let y = 0; y < this.size_y; y++) {
+                res[x][y] = this.plansza[x][y].to_json()
+            }
+        }
+
+        return {
+            size_x: this.size_x,
+            size_y: this.size_y,
+            plansza: res
+        }
+    }
+
+    from_json(dict) {
+        this.size_x = dict.size_x
+        this.size_y = dict.size_y
+        for (let x = 0; x < this.size_x; x++) {
+            for (let y = 0; y < this.size_y; y++) {
+                this.plansza[x][y].from_json(dict[x][y])
+            }
+        }
+    }
 }

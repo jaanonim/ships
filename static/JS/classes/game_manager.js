@@ -69,9 +69,9 @@ export default class GameManager {
         this.p_gracz.hide(false)
         this.p_gracz.update_ships()
 
-        this.p_bot = new Map(this.size_x, this.size_y, this.bot_div)
+        /*this.p_bot = new Map(this.size_x, this.size_y, this.bot_div)
         this.p_bot.generate_map()
-        this.p_bot.lock()
+        this.p_bot.lock()*/
 
         ShipList.selected_id = -1
         ShipList.ship_list = []
@@ -107,8 +107,8 @@ export default class GameManager {
     start_game() {
         this.controls.innerText = ""
         this.p_gracz.lock()
-        Socket.ready()
-        this.move()
+        Socket.ready(JSON.stringify(this.p_gracz.to_json()))
+        //this.move()
     }
 
     turn(t) {

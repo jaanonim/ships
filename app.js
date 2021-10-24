@@ -74,10 +74,36 @@ io.on('connection', (socket) => {
         console.log("ready", msg)
 
         rooms[room].ready++;
-        if (rooms[room].ready == 2) {
-            io.to(room).emit("start")
+        if (rooms[room]["boards"] == null) {
+            rooms[room]["boards"] = {}
         }
+        rooms[room]["boards"][socket.id] = JSON.parse(msg)
+        console.log("ready", rooms[room]["boards"])
+
         io.to(room).emit("status", socket.id)
+        if (rooms[room].ready == 2) {
+            io.to(room).emit("start", rooms[room].boards)
+            rooms[room]["turn"] = Math.round(Math.random())
+            io.to(room).emit("move", Object.keys(rooms[room].boards)[rooms[room]["turn"]])
+        }
+
+    })
+
+    socket.on("plansza", (msg) => {
+
+        let obj = JSON.parse(msg)
+
+        rooms[room]["boards"][socket.id] = obj.board
+        io.to(room).emit("plansza", {
+            id: socket.id,
+            board: rooms[room]["boards"][socket.id]
+        })
+
+
+        if (obj.board.plansza[obj.x][obj.y].type === 2) {
+            rooms[room]["turn"] = rooms[room]["turn"] === 1 ? 0 : 1
+        }
+        io.to(room).emit("move", Object.keys(rooms[room].boards)[rooms[room]["turn"]])
     })
 
 });

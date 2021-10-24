@@ -17,8 +17,8 @@ export default class Socket {
         this.setup()
     }
 
-    static ready() {
-        Socket.socket.emit("ready")
+    static ready(map_json) {
+        Socket.socket.emit("ready", map_json)
     }
 
     setup() {
@@ -36,6 +36,10 @@ export default class Socket {
 
         Socket.socket.on("start", (msg) => {
             console.log("start", msg);
+        });
+
+        Socket.socket.on("move", (msg) => {
+            console.log("move", msg);
         });
     }
 }

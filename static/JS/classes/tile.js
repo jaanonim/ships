@@ -128,5 +128,21 @@ export default class Tile {
         this.ships.splice(index, 1)
     }
 
+    to_json() {
+        return {
+            hit: this.hit,
+            x: this.x,
+            y: this.y,
+            type: this.type
+        }
+    }
+
+    from_json(dict) {
+        this.hit = dict.hit
+        this.x = dict.x
+        this.y = dict.y
+        this.type = dict.type
+        this.update()
+    }
 
 }
