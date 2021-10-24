@@ -90,23 +90,43 @@ io.on('connection', (socket) => {
     })
 
     socket.on("plansza", (msg) => {
-
-        let obj = JSON.parse(msg)
-
-        rooms[room]["boards"][socket.id] = obj.board
+        rooms[room]["boards"][socket.id] = msg.board
         io.to(room).emit("plansza", {
-            id: socket.id,
+            id: msg.id,
+            x: msg.x,
+            y: msg.y,
             board: rooms[room]["boards"][socket.id]
         })
 
+        if (is_gameover(msg.board)) {
+            io.to(room).emit("end", socket.id)
+            return
+        }
 
-        if (obj.board.plansza[obj.x][obj.y].type === 2) {
+        if (msg.board.plansza[msg.x][msg.y].type !== 2) {
             rooms[room]["turn"] = rooms[room]["turn"] === 1 ? 0 : 1
         }
         io.to(room).emit("move", Object.keys(rooms[room].boards)[rooms[room]["turn"]])
     })
 
+    socket.on("restart", (msg) => {
+        rooms[room] = {
+            ready: 0
+        }
+        io.to(room).emit("restart")
+    })
 });
+
+function is_gameover(board) {
+    for (let x = 0; x < board.size_x; x++) {
+        for (let y = 0; y < board.size_y; y++) {
+            if (board.plansza[x][y].type === 2 && !board.plansza[x][y].hit) {
+                return false
+            }
+        }
+    }
+    return true
+}
 
 
 io.on('disconnect', (socket) => {

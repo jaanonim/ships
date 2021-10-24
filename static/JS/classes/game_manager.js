@@ -45,6 +45,7 @@ export default class GameManager {
         this.controls = document.getElementById("controls")
         this.gracz_div = document.getElementById("gracz")
         this.bot_div = document.getElementById("bot")
+        this.buttons = document.getElementById("buttons")
         this.ships = ships
         this.size_x = size_x
         this.size_y = size_y
@@ -56,6 +57,7 @@ export default class GameManager {
         this.gracz_div.innerText = ""
         this.bot_div.innerText = ""
         this.controls.innerText = ""
+        this.buttons.innerText = ""
         document.documentElement.style.setProperty('--x_size', this.size_x);
         document.documentElement.style.setProperty('--y_size', this.size_y);
 
@@ -69,17 +71,39 @@ export default class GameManager {
         this.p_gracz.hide(false)
         this.p_gracz.update_ships()
 
-        /*this.p_bot = new Map(this.size_x, this.size_y, this.bot_div)
-        this.p_bot.generate_map()
-        this.p_bot.lock()*/
+        this.p_opponent = new Map(this.size_x, this.size_y, this.bot_div)
+        this.p_opponent.hide(false)
+        this.p_opponent.lock()
 
         ShipList.selected_id = -1
         ShipList.ship_list = []
         ShipList.update()
 
-        this.bot = new Bot(this.p_gracz)
-        this.bot2 = new Bot(this.p_bot)
-        this.player = 0
+        Socket.set_board = (x, b = false) => {
+            this.controls.innerText = "Ruch przeciwnika"
+            if (b) {
+                this.p_opponent.from_json(x)
+            } else {
+                this.p_gracz.from_json(x)
+            }
+        }
+        Socket.make_move = () => {
+            this.controls.innerText = "Twój ruch"
+
+            this.p_opponent.play((t) => {
+                this.turn(t)
+            })
+        }
+        Socket.ready_f = () => {
+            this.controls.innerText = "Przeciwnik jest gotowy do gry"
+        }
+        Socket.win_f = (b) => {
+            this.end(b)
+        }
+        Socket.restart_f = () => {
+            this.init()
+        }
+
 
         this.ship_pleaced()
     }
@@ -91,7 +115,7 @@ export default class GameManager {
         button.onclick = () => {
             callback()
         }
-        this.controls.appendChild(button)
+        this.buttons.appendChild(button)
     }
 
     ship_pleaced() {
@@ -100,98 +124,36 @@ export default class GameManager {
                 this.start_game()
             })
         } else {
-            this.controls.innerText = ""
+            this.buttons.innerText = ""
         }
     }
 
     start_game() {
-        this.controls.innerText = ""
+        this.buttons.innerText = ""
         this.p_gracz.lock()
         Socket.ready(JSON.stringify(this.p_gracz.to_json()))
-        //this.move()
     }
 
     turn(t) {
-        if (this.end()) {
-            return
-        }
-
+        this.p_opponent.lock()
+        this.controls.innerText = "Ruch przeciwnika"
         if (t.type === 2) {
             t.check_for_sink()
-            this.move()
-        } else {
-            this.next()
         }
+        Socket.send_board(this.p_opponent.to_json(), t.x, t.y)
     }
 
-    next() {
-        this.player = this.player === 1 ? 0 : 1
-        this.move()
-    }
+    end(b) {
 
-    move() {
-        this.controls.innerText = this.player === 0 ? "Ruch gracza" : "Ruch bota"
-        if (this.player === 1) {
-            this.p_bot.lock()
-            setTimeout(() => {
-                let x = this.bot.make_move()
-                x.shoot()
-                this.turn(x)
-            }, 500 + Math.floor(Math.random() * 20)) * 100;
-        } else {
-            this.p_gracz.lock()
-            /*
-                        setTimeout(() => {
-                            let x = this.bot2.make_move()
-                            x.shoot()
-                            this.turn(x)
-                        }, 500 + Math.floor(Math.random() * 20)) * 100;
-                        */
-            this.p_bot.play((t) => {
-                this.turn(t)
-            })
-        }
-    }
+        this.p_opponent.lock()
+        this.p_gracz.lock()
+        this.p_opponent.hide(false)
+        this.p_gracz.hide(false)
 
-    end() {
-        if (this.p_bot.is_end()) {
-            this.p_bot.lock()
-            this.p_gracz.lock()
-            this.p_bot.hide(false)
-            this.p_gracz.hide(false)
-            this.p_bot.update_ships()
-            this.p_gracz.update_ships()
+        this.controls.innerText = b ? "Wygrałęś 🎉" : "Przegrałeś 😥"
+        this.createButton("Zagraj jeszcze raz", () => {
+            Socket.restart()
+        })
 
-            setTimeout(() => {
-                this.controls.innerText = ""
-                alert("Gracz wygrał")
-                this.createButton("Zagraj jeszcze raz", () => {
-                    this.restart()
-                })
-            }, 100)
-            return true
-
-        }
-        if (this.p_gracz.is_end()) {
-            this.p_bot.lock()
-            this.p_gracz.lock()
-            this.p_bot.hide(false)
-            this.p_gracz.hide(false)
-            this.p_bot.update_ships()
-            this.p_gracz.update_ships()
-            setTimeout(() => {
-                this.controls.innerText = ""
-                alert("Bot wygrał")
-                this.createButton("Zagraj jeszcze raz", () => {
-                    this.restart()
-                })
-            }, 100)
-            return true
-        }
-        return false
-    }
-
-    restart() {
-        this.init()
     }
 }

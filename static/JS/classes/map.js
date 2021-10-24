@@ -95,7 +95,7 @@ export default class Map {
         this.size_y = dict.size_y
         for (let x = 0; x < this.size_x; x++) {
             for (let y = 0; y < this.size_y; y++) {
-                this.plansza[x][y].from_json(dict[x][y])
+                this.plansza[x][y].from_json(dict.plansza[x][y])
             }
         }
     }
