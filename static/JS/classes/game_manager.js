@@ -159,6 +159,8 @@ export default class GameManager {
         this.p_gracz.lock()
         this.p_opponent.hide(false)
         this.p_gracz.hide(false)
+        this.p_gracz.update_all()
+        this.p_opponent.update_all()
 
         this.controls.innerText = b ? "Wygrałęś 🎉" : "Przegrałeś 😥"
         this.createButton("Zagraj jeszcze raz", () => {
