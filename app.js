@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const http = require('http');
 const server = http.createServer(app);
+const PORT = process.env.PORT || 5050
 
 app.use(express.urlencoded({
     extended: true
@@ -14,7 +15,7 @@ const {
 const io = new Server(server);
 
 
-server.listen(5050, () => console.log("Listening on http://localhost:5050"))
+server.listen(PORT, () => console.log("Listening on http://localhost:" + PORT))
 
 
 
