@@ -23,6 +23,11 @@ app.get("/", (req, res) => {
     res.redirect("/menu")
 })
 
+app.get("/game/", (req, res) => {
+    res.redirect("/menu")
+})
+
+
 app.get("/game/:code", (req, res) => {
     let code = req.params.code
     if (code != null) {
@@ -147,6 +152,11 @@ io.on('connection', (socket) => {
         console.log("disconnect", socket)
 
         io.to(room).emit("left")
+        const c = io.sockets.adapter.rooms.get(room).size;
+        if (c < 2) {
+            delete rooms[room]
+        }
+
     });
 });
 
